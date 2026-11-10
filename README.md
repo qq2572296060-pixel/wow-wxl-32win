@@ -1,8 +1,12 @@
-# wow-wxl-32win · WarcraftXL 32 位客户端注入版（core 1.1）
+# wow-wxl-32win · 让 3.3.5a 直接读取 12.1 模型资源
 
-> 打包日期：2026-11-11　| 构建日期：2026-11-10 07:40–07:56
-> 真机验证：**1999022 `pandarenserpentmount` 模型 / 贴图 / 粒子 / 动画全对**；`.morph 1999000~1999023` 整批通过
-> 平台：**Win32 / PE32**（3.3.5a 客户端是 32 位，64 位构建不可用）
+> **定位**：给 World of Warcraft **3.3.5a（build 12340）** 客户端加一层注入，让它**直接读取 12.1 的模型资源**
+> （M2 `MD21`、`.skin`、`.blp`）——零售文件**原样进 MPQ**，DLL 在内存里完成翻译，**不做离线降级、不改模型文件**。
+>
+> 构建：WarcraftXL core **1.1**　|　平台：**Win32 / PE32**（3.3.5a 客户端是 32 位，64 位不可用）
+>
+> **验证范围：仅坐骑。** 12.1 商城坐骑**已全部验证通过**（模型 / 贴图 / 粒子 / 动画四项全对）。
+> ⚠ 武器、护甲、建筑、WMO 等其它类别**未验证**，不代表可用。
 >
 > ⚖ **许可 GPL-3.0** · **本仓库不含任何游戏资产**（无 `.m2/.blp/.dbc/MPQ`）· 与 Blizzard Entertainment 无关，仅供私服研究 / 单机学习，
 > 使用需自备合法取得的游戏客户端；`wxl-patcher` 会修改客户端 `Wow.exe`，可能违反游戏服务条款，后果自负。详见 [`NOTICE.md`](NOTICE.md)。
@@ -84,7 +88,7 @@ cmake --build build --config Release --parallel
 - ⚠ 扩展源码里有一处**本机本地修**：`wxl-modern-m2/src/render/CombinerPatch.cpp` 用 `kBlendOne = 1`
   代替 core v1.1 未提供的 `gx::blend::kOne`（改扩展侧，**不要改 core**）。
 
-## 四·五、源码来源（与 `E:\src\WarcraftXL` 到底什么关系）
+## 四·五、源码来源（五件成品分别编自哪棵树）
 
 **有关联，但不是"整个目录都是它的源码"**。逐件比对结果（2026-11-11 现取，详见 `src/ORIGIN.md`）：
 
@@ -93,7 +97,7 @@ cmake --build build --config Release --parallel
 | `WarcraftXL.dll` · `d3d9.dll` · `wxl-patcher.exe` | `src/core-1.1/`（= `core_v11.zip`，上游 1.1 release） | 三件由该树直接编出 |
 | `wxl-modern-m2.dll` | `src/repos/wxl-modern-m2/`（`dc0b7df`，2026-11-06） | **41 个文件相同 / 1 个不同**，差异 = `CombinerPatch.cpp` 的 `kBlendOne` 本地修 |
 | `wxl-db2.dll` | `src/repos/wxl-db2/`（`30e4f2c`，2026-08-13） | **22/22 md5 全同，零差异** |
-| —（**不是**来源） | `E:\src\WarcraftXL\wxl-core`（`aa4d014`，2026-08-03 浅克隆） | 与 `core-1.1/ src/` 有 **107 处差异**，且 `src/core`/`src/events`/`build_host` 只在仓库侧 ⇒ 结构已分叉 |
+| —（**不是**来源） | 上游 `wxl-core` 仓库（`aa4d014`，2026-08-03 浅克隆） | 与 `core-1.1/ src/` 有 **107 处差异**，且 `src/core`/`src/events`/`build_host` 只在仓库侧 ⇒ 结构已分叉 |
 
 ⇒ 所以**两个扩展仓库的源码已随包带上**（`src/repos/`，677 KB，仅源码不含 `.git`/`store`）；
 `wxl-core` 仓库**没有**打进来——它不是本包二进制的源码，带了反而误导。
@@ -105,8 +109,11 @@ cmake --build build --config Release --parallel
 - 扩展 `wxl.json` 的 `abi` 必须是 **1.1**，与 core 版本不匹配时扩展会被拒载（日志有 `abi` 字样）。
 - 与第四代 `divxproxy`（`DivxDecoder.dll`）**不要同时装**：两代抢同一条渲染链，切代前把另一代撤干净。
 
-## 六、配套文档（技能内，随技能更新）
+## 六、延伸阅读（都在本仓库内）
 
-- `~/.workbuddy/skills/wow-高版本素材提取/references/18-wxl-core纯注入权威流程.md` —— 机制 / 编译 / 资产两件事 / 判据 / 诊断三态
-- `~/.workbuddy/skills/wow-高版本素材提取/binaries/README.md` —— 二进制台账（本包的同源副本在技能 `binaries/wxl-core-1.1/`）
-- 素材侧（`TextureFilePath.db2` 怎么造、零售表怎么补）：同技能 `scripts/gen_texturefilepath_db2.py` · `scripts/extract_retail_db2.py`
+- [`src/ORIGIN.md`](src/ORIGIN.md) —— **五件成品 ↔ 源码**逐件对应、上游 commit、比对证据、复现步骤
+- [`src/patches/local-01-combiner-kblendone.patch`](src/patches/local-01-combiner-kblendone.patch) —— 唯一一处本地补丁
+- [`NOTICE.md`](NOTICE.md) —— 上游归属、许可证、免责声明
+- [`src/core-1.1/README.md`](src/core-1.1/README.md) —— 上游 core 自带的编译与架构说明
+
+> 素材侧不在本仓库：本仓库只负责「让客户端能读 12.1 资源」，**不含也不提供任何游戏资源**。
