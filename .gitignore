@@ -1,0 +1,19 @@
+# 打包压缩件：内容可由目录重建，不入库
+*.zip
+
+# 构建产物
+build/
+build_*/
+out/
+.vs/
+CMakeFiles/
+CMakeCache.txt
+
+# Python
+__pycache__/
+*.pyc
+
+# 编辑器 / 系统
+*.swp
+Thumbs.db
+.DS_Store

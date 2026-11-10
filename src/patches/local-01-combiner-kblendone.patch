@@ -1,0 +1,16 @@
+--- E:/src/WarcraftXL/wxl-modern-m2/src/render/CombinerPatch.cpp	2026-11-09 11:32:34.650197100 +0800
++++ E:/tmp/pserpent_1999022/_core_v11/core-1.1/extensions/wxl-modern-m2/src/render/CombinerPatch.cpp	2026-11-10 07:41:11.990662700 +0800
+@@ -124,8 +124,11 @@
+ 
+         // The minted shader pair is ADDITIVE; the native blend state of the batch it replaces is not.
+         // Without this the add-alpha primitive draws with whatever state was left bound.
+-        set(gxDev, nullptr, kStateSrcBlend,  reinterpret_cast<void*>(static_cast<uintptr_t>(wxl::game::gx::blend::kOne)));
+-        set(gxDev, nullptr, kStateDestBlend, reinterpret_cast<void*>(static_cast<uintptr_t>(wxl::game::gx::blend::kOne)));
++        // NOTE(local): core v1.1's gx::blend declares only kSrcAlpha(5)/kInvSrcAlpha(6); this module
++        // expects a kOne too. D3DBLEND_ONE == 1, so spell it out here instead of patching the core SDK.
++        constexpr unsigned kBlendOne = 1 /* D3DBLEND_ONE */;
++        set(gxDev, nullptr, kStateSrcBlend,  reinterpret_cast<void*>(static_cast<uintptr_t>(kBlendOne)));
++        set(gxDev, nullptr, kStateDestBlend, reinterpret_cast<void*>(static_cast<uintptr_t>(kBlendOne)));
+     }
+ }
+ 

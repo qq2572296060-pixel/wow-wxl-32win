@@ -1,0 +1,15 @@
+# 二进制文件不做行尾转换 / 文本合并
+*.dll   binary
+*.exe   binary
+*.lib   binary
+*.exp   binary
+*.zip   binary
+
+# 文本统一 LF
+*.md    text eol=lf
+*.c     text eol=lf
+*.h     text eol=lf
+*.hpp   text eol=lf
+*.cpp   text eol=lf
+*.cmake text eol=lf
+*.patch text eol=lf
